@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reward Redemption</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Redemption Page</h1>
+        <p class="description">Enter your redemption code to claim your prize.</p>
+        
+        <div class="code-container">
+            <input type="text" id="codeInput" placeholder="Enter redemption code">
+        </div>
+        
+        <button onclick="checkCode()">Check Code</button>
+        <div id="message"></div>
+        <p class="hint">The redemption code is provided by the game host. If you've won, ask the host for your code.</p>
+        
+        <p class="credits">🎁</p>
+    </div>
+
+    <!-- Password Type Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            
+            <div class="modal-header">
+                <img id="modalImage" src="" class="reward-logo" alt="Reward Logo">
+                <span id="modalTitle" class="reward-text"></span>
+            </div>
+            
+            <p id="modalInstructions">Enter the password to claim your reward:</p>
+            
+            <div class="password-container">
+                <input type="password" id="modalPasswordInput" placeholder="Password">
+            </div>
+            
+            <button onclick="checkModalPassword()">Claim Reward</button>
+            
+            <div id="modalMessage"></div>
+            
+            <div id="secretContainer" class="secret-container hidden">
+                <span id="secretMessage" class="secret-message">••••••••••••••••</span>
+                <button class="toggle-secret" onclick="toggleSecret()">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            
+            <p class="credits">Congratulations!</p>
+        </div>
+    </div>
+
+    <!-- Form Type Modal -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            
+            <div class="modal-header">
+                <img id="formModalImage" src="" class="reward-logo" alt="Reward Logo">
+                <span id="formModalTitle" class="reward-text"></span>
+            </div>
+            
+            <p id="formModalInstructions">Please fill out the form to claim your reward:</p>
+            
+            <div id="formFieldsContainer" class="form-container">
+                <!-- Dynamic form fields will be inserted here -->
+            </div>
+            
+            <div class="redemption-key-container">
+                <label>Redemption Key:</label>
+                <input type="text" id="redemptionKeyDisplay" readonly>
+            </div>
+            
+            <button onclick="submitForm()">Submit</button>
+            
+            <div id="formModalMessage"></div>
+            
+            <p class="credits">Your reward will be processed shortly.</p>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
