@@ -169,3 +169,9 @@ document.getElementById('modalPasswordInput').addEventListener('keypress', funct
         checkModalPassword();
     }
 });
+// Attach functions to window for HTML onclick handlers
+window.checkCode = checkCode;
+window.checkModalPassword = checkModalPassword;
+window.submitForm = submitForm;
+window.toggleSecret = toggleSecret;
+window.closeModal = closeModal;
