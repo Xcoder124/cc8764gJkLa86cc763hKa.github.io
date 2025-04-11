@@ -1,1 +1,401 @@
-<p>HI</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Guessing Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2b6cb0;
+            --secondary: #4299e1;
+            --accent: #f6ad55;
+            --dark: #2d3748;
+            --light: #f7fafc;
+            --success: #48bb78;
+            --error: #f56565;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #f6d365, #fda085);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .password-container {
+            position: relative;
+            margin: 25px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            background: linear-gradient(to right, #f6d365, #fda085);
+            color: var(--dark);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(246, 173, 85, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(246, 173, 85, 0.6);
+        }
+
+        #message {
+            margin-top: 20px;
+            min-height: 24px;
+            font-weight: 500;
+        }
+
+        .success {
+            color: var(--success);
+        }
+
+        .error {
+            color: var(--error);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #2d3748, #1a202c);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transform: scale(0.9);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .garena-logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        .garena-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .secret-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .secret-message {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+        }
+
+        .toggle-secret {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .credits {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .hint {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            input {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            button {
+                padding: 12px 25px;
+                font-size: 0.95rem;
+            }
+
+            .garena-logo {
+                width: 40px;
+                height: 40px;
+                margin-right: 10px;
+            }
+
+            .garena-text {
+                font-size: 1.2rem;
+            }
+
+            .secret-message {
+                font-size: 1rem;
+            }
+
+            .credits {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Premium Reward</h1>
+        <p class="description">Enter the correct password to claim your Garena Shells reward</p>
+        
+        <div class="password-container">
+            <input type="password" id="passwordInput" placeholder="Password:XXXXXXXX">
+        </div>
+        
+        <button onclick="checkPassword()">Claim Reward</button>
+        <div id="message"></div>
+        <p class="hint">Hint: The password format is "Password:YYYYMMDD"</p>
+        
+        <p class="credits">Coded By: Adeel T.</p>
+    </div>
+
+    <div id="winModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            
+            <div class="modal-header">
+                <img src="https://img.icons8.com/?size=96&id=38642&format=png" class="garena-logo" alt="Garena Logo">
+                <span class="garena-text">Garena Shells ₱10</span>
+            </div>
+            
+            <p>Congratulations! Here's your reward code:</p>
+            
+            <div class="secret-container">
+                <span id="secretMessage" class="secret-message">••••••••••••••••</span>
+                <button class="toggle-secret" onclick="toggleSecret()">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            
+            <p class="credits">Coded By: Adeel T.</p>
+        </div>
+    </div>
+
+    <script>
+        const encryptionKey = String.fromCharCode(
+            0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0
+        );
+
+        function decrypt(data, key) {
+            return data.split('').map((char, index) =>
+                String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length))
+            ).join('');
+        }
+
+        function encrypt(data, key) {
+            return data.split('').map((char, index) =>
+                String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(index % key.length))
+            ).join('');
+        }
+
+        const encryptedData = {
+            password: encrypt("Password:20100826", encryptionKey),
+            message: encrypt("2067333798011888", encryptionKey)
+        };
+
+        function checkPassword() {
+            const correctPassword = decrypt(encryptedData.password, encryptionKey);
+            const userInput = document.getElementById('passwordInput').value;
+            const messageElement = document.getElementById('message');
+
+            if (userInput === "") {
+                messageElement.textContent = "Please enter a password!";
+                messageElement.className = "error";
+                return;
+            }
+
+            if (userInput === correctPassword) {
+                const modal = document.getElementById('winModal');
+                modal.classList.add('active');
+
+                const secretMessage = decrypt(encryptedData.message, encryptionKey);
+                document.getElementById('secretMessage').setAttribute('data-real', secretMessage);
+
+                messageElement.textContent = "";
+            } else {
+                messageElement.textContent = "Incorrect password! Try again.";
+                messageElement.className = "error";
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('winModal');
+            modal.classList.remove('active');
+
+            const secretElement = document.getElementById('secretMessage');
+            secretElement.textContent = '••••••••••••••••';
+            secretElement.removeAttribute('data-visible');
+        }
+
+        function toggleSecret() {
+            const secretElement = document.getElementById('secretMessage');
+            const realMessage = secretElement.getAttribute('data-real');
+
+            if (secretElement.hasAttribute('data-visible')) {
+                secretElement.textContent = '••••••••••••••••';
+                secretElement.removeAttribute('data-visible');
+            } else {
+                secretElement.textContent = realMessage;
+                secretElement.setAttribute('data-visible', 'true');
+            }
+        }
+
+        document.getElementById('passwordInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
+</body>
+  </html>
