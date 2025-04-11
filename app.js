@@ -75,54 +75,159 @@ async function incrementRedemptionCount(messageElement = null) {
   }
 }
 
+function showConfirmationModal(username, userId, zoneId) {
+  const modal = document.getElementById('confirmationModal');
+  const formattedUsername = username.replace(/\+/g, ' ');
+  
+  document.getElementById('confirmModalImage').src = currentReward.imageUrl;
+  document.getElementById('confirmUsername').textContent = formattedUsername;
+  document.getElementById('confirmUserId').textContent = userId;
+  document.getElementById('confirmZoneId').textContent = zoneId;
+  
+  modal.classList.add('active');
+}
+
 async function submitForm() {
   const messageElement = document.getElementById('formModalMessage');
   const spinner = document.getElementById('formSpinner');
-  messageElement.textContent = "Submitting...";
+  messageElement.textContent = "Validating...";
   spinner.classList.remove('hidden');
   messageElement.className = "";
 
-  if (!currentReward.formFields || currentReward.formFields.length === 0) {
-    messageElement.textContent = "Form fields not defined.";
+  if (!currentReward.formFields || Object.keys(currentReward.formFields).length === 0) {
+    messageElement.textContent = "Form configuration error.";
     messageElement.className = "error";
     spinner.classList.add('hidden');
     return;
   }
-
-  let allValid = true;
-  currentReward.formFields.forEach(field => {
-    const input = document.getElementById(`form_${field.replace(/\s+/g, '_')}`);
-    if (!input.value.trim()) allValid = false;
-  });
-
-  if (!allValid) {
-    messageElement.textContent = "Please fill all required fields!";
-    messageElement.className = "error";
-    spinner.classList.add('hidden');
-    return;
-  }
-
-  const formData = {
-    reward: currentReward.title,
-    code: currentReward.code,
-    timestamp: new Date().toISOString()
-  };
-
-  currentReward.formFields.forEach(field => {
-    formData[field] = document.getElementById(`form_${field.replace(/\s+/g, '_')}`).value.trim();
-  });
 
   try {
-    await addDoc(collection(db, "submissions"), formData);
-    await incrementRedemptionCount();
-    messageElement.textContent = "Form submitted successfully! Your reward will be processed shortly.";
-    messageElement.className = "success";
+    const formValues = {};
+    const fieldKeys = Object.keys(currentReward.formFields);
+    
+    let userId, zoneId;
+
+    fieldKeys.forEach(key => {
+      const input = document.getElementById(`form_${key}`);
+      formValues[key] = input.value.trim();
+
+      if (key.toLowerCase() === 'userid') userId = formValues[key];
+      if (key.toLowerCase() === 'zoneid') zoneId = formValues[key];
+    });
+
+    const missingFields = fieldKeys
+      .filter(key => currentReward.formFields[key].required)
+      .filter(key => !formValues[key])
+      .map(key => currentReward.formFields[key].label);
+
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+
+    if (!userId || !zoneId) {
+      throw new Error("User ID and Zone ID are required");
+    }
+
+    const mlbbUsername = await get_mlbb_username(userId, zoneId);
+
+    if (mlbbUsername.startsWith("Error")) {
+      throw new Error(mlbbUsername);
+    }
+
+    showConfirmationModal(
+      mlbbUsername.replace(/\+/g, ' '),
+      userId,
+      zoneId
+    );
+
   } catch (error) {
-    console.error("Error submitting form:", error);
-    messageElement.textContent = `Error: ${error.message || error}`;
+    messageElement.textContent = error.message;
     messageElement.className = "error";
   } finally {
     spinner.classList.add('hidden');
+  }
+}
+
+async function confirmSubmission() {
+  console.log("Confirm button clicked");
+  const spinner = document.getElementById('confirmSpinner');
+  const messageElement = document.getElementById('confirmationMessage');
+
+  try {
+    messageElement.textContent = `Preparing submission data...`;
+    messageElement.className = "success";
+
+    const formData = {
+      reward: currentReward?.title || '',
+      code: currentReward?.code || '',
+      timestamp: new Date().toISOString(),
+      username: document.getElementById('confirmUsername')?.textContent || '',
+      userId: document.getElementById('confirmUserId')?.textContent || '',
+      zoneId: document.getElementById('confirmZoneId')?.textContent || ''
+    };
+
+    const fieldKeys = Object.keys(currentReward?.formFields || {});
+    fieldKeys.forEach(key => {
+      const input = document.getElementById(`form_${key}`);
+      if (input && input.value) {
+        formData[key] = input.value.trim();
+      }
+    });
+
+    console.log("Final formData:", formData);
+
+    await addDoc(collection(db, "submissions"), formData);
+    await incrementRedemptionCount();
+
+    messageElement.textContent = "🎉 Success! You have submitted your request. Please wait for the hoster (Adeel Torres) message confirmation.";
+    messageElement.className = "success";
+
+    setTimeout(() => {
+      console.log("Closing modals...");
+      closeConfirmationModal();
+      closeModal();
+    }, 6000);
+
+  } catch (error) {
+    console.error("Submission error:", error);
+    messageElement.textContent = `❌ Error: ${error.message}`;
+    messageElement.className = "error";
+  } finally {
+    spinner.classList.add('hidden');
+    console.log("Submission process completed");
+  }
+}
+
+function closeConfirmationModal() {
+  document.getElementById('confirmationModal').classList.remove('active');
+}
+
+async function get_mlbb_username(user_id, zone_id) {
+  if (!user_id || !zone_id) {
+    return "Error: UserID and ZoneID are required";
+  }
+
+  try {
+    const response = await fetch('https://8jgdaj77-ajajga-production.up.railway.app/validate-mlbb', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: user_id.toString(),
+        zoneId: zone_id.toString(),
+        voucherTypeName: "MOBILE_LEGENDS",
+        deviceId: self.crypto.randomUUID(),
+        country: "sg"
+      })
+    });
+
+    const data = await response.json();
+    const rawUsername = data.result?.username || "";
+    const formattedUsername = rawUsername.replace(/\+/g, ' ').trim();
+    
+    return formattedUsername || "Error: Username not found";
+    
+  } catch (error) {
+    return `Network Error: ${error.message}`;
   }
 }
 
@@ -139,30 +244,34 @@ function showPasswordModal() {
 function showFormModal() {
   const modal = document.getElementById('formModal');
   const formContainer = document.getElementById('formFieldsContainer');
-
-  document.getElementById('formModalTitle').textContent = currentReward.title;
-  document.getElementById('formModalImage').src = currentReward.imageUrl;
-  document.getElementById('formModalInstructions').textContent = currentReward.instructions || "Please fill out the form to claim your reward:";
-  document.getElementById('redemptionKeyDisplay').value = currentReward.code;
-
   formContainer.innerHTML = '';
-  currentReward.formFields.forEach(field => {
+
+  const fieldKeys = Object.keys(currentReward.formFields);
+
+  fieldKeys.forEach(key => {
+    const field = currentReward.formFields[key];
+    
     const fieldDiv = document.createElement('div');
     fieldDiv.className = 'form-field';
 
     const label = document.createElement('label');
-    label.textContent = field;
+    label.textContent = field.label;
 
     const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = field;
-    input.id = `form_${field.replace(/\s+/g, '_')}`;
+    input.type = field.type || 'text';
+    input.placeholder = field.placeholder || field.label;
+    input.required = field.required || false;
+    input.id = `form_${key}`;
 
     fieldDiv.appendChild(label);
     fieldDiv.appendChild(input);
     formContainer.appendChild(fieldDiv);
   });
 
+  document.getElementById('formModalTitle').textContent = currentReward.title;
+  document.getElementById('formModalImage').src = currentReward.imageUrl;
+  document.getElementById('redemptionKeyDisplay').value = currentReward.code;
+  
   modal.classList.add('active');
 }
 
@@ -240,10 +349,12 @@ document.getElementById('modalPasswordInput').addEventListener('keypress', e => 
   if (e.key === 'Enter') checkModalPassword();
 });
 
-// Attach functions globally
+// ================== Global Exports ================== //
 window.checkCode = checkCode;
 window.checkModalPassword = checkModalPassword;
 window.submitForm = submitForm;
 window.toggleSecret = toggleSecret;
 window.closeModal = closeModal;
 window.showRedemptionHelp = showRedemptionHelp;
+window.closeConfirmationModal = closeConfirmationModal;
+window.confirmSubmission = confirmSubmission;
