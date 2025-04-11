@@ -1,7 +1,11 @@
-let currentReward = null;
-const adminEmail = "your-admin-email@example.com"; // Replace with your admin email
+import { db } from './firebase-config.js';
+import { collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
-function checkCode() {
+let currentReward = null;
+const adminEmail = "huhhello80@gmail.com"; // Replace with your admin email
+
+// ================== Firebase Functions ================== //
+async function checkCode() {
     const code = document.getElementById('codeInput').value.trim();
     const messageElement = document.getElementById('message');
 
@@ -14,33 +18,62 @@ function checkCode() {
     messageElement.textContent = "Checking code...";
     messageElement.className = "";
 
-    db.collection("rewards").where("code", "==", code).get()
-        .then((querySnapshot) => {
-            if (querySnapshot.empty) {
-                messageElement.textContent = "Invalid redemption code!";
-                messageElement.className = "error";
-                return;
-            }
+    try {
+        const q = query(collection(db, "rewards"), where("code", "==", code));
+        const querySnapshot = await getDocs(q);
 
-            querySnapshot.forEach((doc) => {
-                currentReward = doc.data();
-                messageElement.textContent = "";
-                messageElement.className = "";
-
-                if (currentReward.type === "password") {
-                    showPasswordModal();
-                } else if (currentReward.type === "form") {
-                    showFormModal();
-                }
-            });
-        })
-        .catch((error) => {
-            console.error("Error getting document:", error);
-            messageElement.textContent = "An error occurred. Please try again.";
+        if (querySnapshot.empty) {
+            messageElement.textContent = "Invalid redemption code!";
             messageElement.className = "error";
+            return;
+        }
+
+        querySnapshot.forEach((doc) => {
+            currentReward = doc.data();
+            messageElement.textContent = "";
+            messageElement.className = "";
+
+            if (currentReward.type === "password") {
+                showPasswordModal();
+            } else if (currentReward.type === "form") {
+                showFormModal();
+            }
         });
+    } catch (error) {
+        console.error("Error getting document:", error);
+        messageElement.textContent = "An error occurred. Please try again.";
+        messageElement.className = "error";
+    }
 }
 
+async function submitForm() {
+    const messageElement = document.getElementById('formModalMessage');
+    messageElement.textContent = "Submitting...";
+    messageElement.className = "";
+    
+    const formData = {
+        reward: currentReward.title,
+        code: currentReward.code,
+        timestamp: new Date().toISOString()
+    };
+    
+    currentReward.formFields.forEach(field => {
+        const fieldId = `form_${field.replace(/\s+/g, '_')}`;
+        formData[field] = document.getElementById(fieldId).value;
+    });
+    
+    try {
+        await addDoc(collection(db, "submissions"), formData);
+        messageElement.textContent = "Form submitted successfully! Your reward will be processed shortly.";
+        messageElement.className = "success";
+    } catch (error) {
+        console.error("Error submitting form:", error);
+        messageElement.textContent = "Error submitting form. Please try again.";
+        messageElement.className = "error";
+    }
+}
+
+// ================== UI Functions (No Changes Needed) ================== //
 function showPasswordModal() {
     const modal = document.getElementById('passwordModal');
     document.getElementById('modalTitle').textContent = currentReward.title;
@@ -60,10 +93,8 @@ function showFormModal() {
     document.getElementById('formModalInstructions').textContent = currentReward.instructions || "Please fill out the form to claim your reward:";
     document.getElementById('redemptionKeyDisplay').value = currentReward.code;
     
-    // Clear previous form fields
     formContainer.innerHTML = '';
     
-    // Add dynamic form fields
     currentReward.formFields.forEach(field => {
         const fieldDiv = document.createElement('div');
         fieldDiv.className = 'form-field';
@@ -99,36 +130,6 @@ function checkModalPassword() {
     }
 }
 
-function submitForm() {
-    const messageElement = document.getElementById('formModalMessage');
-    messageElement.textContent = "Submitting...";
-    messageElement.className = "";
-    
-    // Collect form data
-    const formData = {
-        reward: currentReward.title,
-        code: currentReward.code,
-        timestamp: new Date().toISOString()
-    };
-    
-    currentReward.formFields.forEach(field => {
-        const fieldId = `form_${field.replace(/\s+/g, '_')}`;
-        formData[field] = document.getElementById(fieldId).value;
-    });
-    
-    // Send to Firestore (in production, use Firebase Functions to send email)
-    db.collection("submissions").add(formData)
-        .then(() => {
-            messageElement.textContent = "Form submitted successfully! Your reward will be processed shortly.";
-            messageElement.className = "success";
-        })
-        .catch((error) => {
-            console.error("Error submitting form:", error);
-            messageElement.textContent = "Error submitting form. Please try again.";
-            messageElement.className = "error";
-        });
-}
-
 function toggleSecret() {
     const secretElement = document.getElementById('secretMessage');
     const realMessage = secretElement.getAttribute('data-real');
@@ -156,7 +157,7 @@ function closeModal() {
     document.getElementById('formModalMessage').textContent = '';
 }
 
-// Event listeners
+// ================== Event Listeners (No Changes Needed) ================== //
 document.getElementById('codeInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         checkCode();
