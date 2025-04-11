@@ -7,9 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <!-- Removed Firebase SDK scripts (now handled via modules) -->
 </head>
 <body>
     <div class="game-container">
@@ -86,7 +84,24 @@
             <p class="credits">Your reward will be processed shortly.</p>
         </div>
     </div>
-    <script type="module" src="firebase-config.js"></script>
-<script type="module" src="app.js"></script>
+
+    <!-- Firebase Integration (Module System) -->
+    <script type="module">
+        // Import db from your existing firebase-config.js
+        import { db } from './firebase-config.js';
+        
+        // Make db available globally (temporary solution)
+        window.db = db;
+        
+        // Import and attach functions from app.js
+        import { checkCode, checkModalPassword, submitForm, toggleSecret, closeModal } from './app.js';
+        
+        // Attach to window for HTML onclick handlers
+        window.checkCode = checkCode;
+        window.checkModalPassword = checkModalPassword;
+        window.submitForm = submitForm;
+        window.toggleSecret = toggleSecret;
+        window.closeModal = closeModal;
+    </script>
 </body>
 </html>
