@@ -86,22 +86,6 @@
     </div>
 
     <!-- Firebase Integration (Module System) -->
-    <script type="module">
-        // Import db from your existing firebase-config.js
-        import { db } from './firebase-config.js';
-        
-        // Make db available globally (temporary solution)
-        window.db = db;
-        
-        // Import and attach functions from app.js
-        import { checkCode, checkModalPassword, submitForm, toggleSecret, closeModal } from './app.js';
-        
-        // Attach to window for HTML onclick handlers
-        window.checkCode = checkCode;
-        window.checkModalPassword = checkModalPassword;
-        window.submitForm = submitForm;
-        window.toggleSecret = toggleSecret;
-        window.closeModal = closeModal;
-    </script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
