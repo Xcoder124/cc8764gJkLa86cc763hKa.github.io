@@ -1,91 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reward Redemption</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <!-- Removed Firebase SDK scripts (now handled via modules) -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reward Redemption</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-    <div class="game-container">
-        <h1>Redemption Page</h1>
-        <p class="description">Enter your redemption code to claim your prize.</p>
-        
-        <div class="code-container">
-            <input type="text" id="codeInput" placeholder="Enter redemption code">
-        </div>
-        
-        <button onclick="checkCode()">Check Code</button>
-        <div id="message"></div>
-        <p class="hint">The redemption code is provided by the game host. If you've won, ask the host for your code.</p>
-        
-        <p class="credits">🎁</p>
+  <div class="game-container">
+    <h1>Redemption Center</h1>
+    <p class="description">Enter your redemption code to claim your prize.</p>
+
+    <div class="code-container input-group">
+      <i class="fas fa-gift input-icon"></i>
+      <input type="text" id="codeInput" placeholder="Enter redemption code"/>
     </div>
 
-    <!-- Password Type Modal -->
-    <div id="passwordModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">&times;</button>
-            
-            <div class="modal-header">
-                <img id="modalImage" src="" class="reward-logo" alt="Reward Logo">
-                <span id="modalTitle" class="reward-text"></span>
-            </div>
-            
-            <p id="modalInstructions">Enter the password to claim your reward:</p>
-            
-            <div class="password-container">
-                <input type="password" id="modalPasswordInput" placeholder="Password">
-            </div>
-            
-            <button onclick="checkModalPassword()">Claim Reward</button>
-            
-            <div id="modalMessage"></div>
-            
-            <div id="secretContainer" class="secret-container hidden">
-                <span id="secretMessage" class="secret-message">••••••••••••••••</span>
-                <button class="toggle-secret" onclick="toggleSecret()">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-            
-            <p class="credits">Congratulations!</p>
-        </div>
-    </div>
+    <button onclick="checkCode()">
+      <i class="fas fa-check button-icon"></i> Check Code
+      <span id="checkSpinner" class="loading-spinner hidden">
+        <i class="fas fa-spinner"></i>
+      </span>
+    </button>
 
-    <!-- Form Type Modal -->
-    <div id="formModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">&times;</button>
-            
-            <div class="modal-header">
-                <img id="formModalImage" src="" class="reward-logo" alt="Reward Logo">
-                <span id="formModalTitle" class="reward-text"></span>
-            </div>
-            
-            <p id="formModalInstructions">Please fill out the form to claim your reward:</p>
-            
-            <div id="formFieldsContainer" class="form-container">
-                <!-- Dynamic form fields will be inserted here -->
-            </div>
-            
-            <div class="redemption-key-container">
-                <label>Redemption Key:</label>
-                <input type="text" id="redemptionKeyDisplay" readonly>
-            </div>
-            
-            <button onclick="submitForm()">Submit</button>
-            
-            <div id="formModalMessage"></div>
-            
-            <p class="credits">Your reward will be processed shortly.</p>
-        </div>
-    </div>
+    <div id="message"></div>
+    <p class="hint">The redemption code is provided by the game host. If you've won, ask the host for your code.</p>
+    <p class="credits">🎁</p>
+  </div>
 
-    <!-- Firebase Integration (Module System) -->
-    <script type="module" src="app.js"></script>
+  <!-- Password Modal -->
+  <div id="passwordModal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+
+      <div class="modal-header">
+        <img id="modalImage" src="" class="reward-logo" alt="Reward Logo"/>
+        <span id="modalTitle" class="reward-text"></span>
+      </div>
+
+      <p id="modalInstructions">Enter the password to claim your reward:</p>
+
+      <div class="password-container input-group">
+        <i class="fas fa-lock input-icon"></i>
+        <input type="password" id="modalPasswordInput" placeholder="Password"/>
+      </div>
+
+      <button onclick="checkModalPassword()">
+        <i class="fas fa-unlock button-icon"></i> Claim Reward
+        <span id="passwordSpinner" class="loading-spinner hidden">
+          <i class="fas fa-spinner"></i>
+        </span>
+      </button>
+
+      <div id="modalMessage"></div>
+
+      <div id="secretContainer" class="secret-container hidden">
+        <span id="secretMessage" class="secret-message">••••••••••••••••</span>
+        <button class="toggle-secret" onclick="toggleSecret()">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+
+      <p class="credits">
+        <a href="javascript:void(0)" onclick="showRedemptionHelp()" class="help-link">
+          How to redeem? <i class="fas fa-question-circle"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <div class="modal-header">
+        <img id="helpModalImage" src="" class="reward-logo" alt="Reward Logo"/>
+        <span class="reward-text">Garena Shells</span>
+      </div>
+
+      <div class="help-content">
+        <br/>
+        <b>How to reload Garena account with Garena Shells?</b><br/><br/>
+        Go to <a href="https://shop.garena.ph" target="_blank" class="shop-link">Garena PH Topup Center</a><br/><br/>
+        1. Login to your Garena Account or Player ID<br/>
+        2. Click Call of Duty: Mobile and select Garena Prepaid Card<br/>
+        3. Enter your Garena Shell Prepaid Card Password<br/>
+        4. Click Confirm to complete top up
+      </div>
+
+      <p class="credits">Need more help? Contact support</p>
+    </div>
+  </div>
+
+  <!-- Form Modal -->
+  <div id="formModal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+
+      <div class="modal-header">
+        <img id="formModalImage" src="" class="reward-logo" alt="Reward Logo"/>
+        <span id="formModalTitle" class="reward-text"></span>
+      </div>
+
+      <p id="formModalInstructions">Please fill out the form to claim your reward:</p>
+
+      <div id="formFieldsContainer" class="form-container">
+        <!-- Dynamic form fields will be inserted here -->
+      </div>
+
+      <div class="redemption-key-container">
+        <label>Redemption Key:</label>
+        <input type="text" id="redemptionKeyDisplay" readonly/>
+      </div>
+
+      <button onclick="submitForm()">
+        <i class="fas fa-paper-plane button-icon"></i> Submit
+        <span id="formSpinner" class="loading-spinner hidden">
+          <i class="fas fa-spinner"></i>
+        </span>
+      </button>
+
+      <div id="formModalMessage"></div>
+      <p class="credits">Your reward will be processed shortly.</p>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>
