@@ -207,8 +207,7 @@ async function get_mlbb_username(user_id, zone_id) {
     return "Error: UserID and ZoneID are required";
   }
 
-  try {
-    const response = await fetch('https://8jgdaj77-ajajga-production.up.railway.app/validate-mlbb', {
+  try { const response = await fetch('https://8jgdaj77-ajajga-production.up.railway.app/validate-mlbb', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -222,7 +221,8 @@ async function get_mlbb_username(user_id, zone_id) {
 
     const data = await response.json();
     const rawUsername = data.result?.username || "";
-    const formattedUsername = rawUsername.replace(/\+/g, ' ').trim();
+    const decodedUsername = decodeURIComponent(rawUsername); // Add this line
+    const formattedUsername = decodedUsername.replace(/\+/g, ' ').trim(); // Modify this line
     
     return formattedUsername || "Error: Username not found";
     
