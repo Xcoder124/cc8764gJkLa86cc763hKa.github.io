@@ -58,6 +58,66 @@ body::before {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Fixed input with icons */
+.input-group input {
+    padding-left: 50px !important;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.6);
+    z-index: 2;
+}
+
+/* Proper close button */
+.close-modal {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 1.5rem !important;
+    top: 10px;
+    right: 10px;
+}
+
+/* Restored modal dimensions */
+.modal-content {
+    background: linear-gradient(145deg, #2d1211, #1a0a09);
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    transform: scale(0.9);
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+}
+
+/* Visible spinners */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Rest of existing styles remain unchanged below this line */
+/* ... (keep all other existing styles from previous version) ... */
+
+@media (max-width: 600px) {
+    .modal-content {
+        padding: 25px;
+    }
+
+
 h1 {
     font-size: 2.5rem;
     margin-bottom: 10px;
@@ -116,6 +176,10 @@ button {
     transition: all 0.3s;
     margin-top: 10px;
     box-shadow: 0 4px 15px rgba(246, 173, 85, 0.4);
+}
+
+.button-icon {
+    margin-right: 8px;  /* Creates space between icon and text */
 }
 
 button:hover {
@@ -296,6 +360,41 @@ button:hover {
     opacity: 0.8;
 }
 
+/* New help link styles */
+.help-link {
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: opacity 0.3s;
+}
+
+.help-link:hover {
+    opacity: 0.8;
+}
+
+.fa-question-circle {
+    font-size: 0.8em;
+}
+
+/* Help modal content */
+.help-content {
+    text-align: left;
+    line-height: 1.6;
+    padding: 0 20px;
+}
+
+.shop-link {
+    color: var(--success);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.shop-link:hover {
+    text-decoration: underline;
+}
+
 /* Responsive styling */
 @media (max-width: 600px) {
     h1 {
@@ -348,4 +447,16 @@ button:hover {
         width: 25px;
         height: 25px;
     }
-}
+
+    .modal-content {
+        padding: 25px;
+    }
+    
+    input {
+        padding: 12px 16px 12px 45px !important;
+    }
+    
+    .input-icon {
+        left: 20px;
+    }
+    }
