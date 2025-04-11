@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reward Redemption</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link rel="stylesheet" href="styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="game-container">
@@ -15,7 +15,7 @@
 
     <div class="code-container input-group">
       <i class="fas fa-gift input-icon"></i>
-      <input type="text" id="codeInput" placeholder="Enter redemption code"/>
+      <input type="text" id="codeInput" placeholder="Enter redemption code" />
     </div>
 
     <button onclick="checkCode()">
@@ -33,9 +33,8 @@
   <!-- Password Modal -->
   <div id="passwordModal" class="modal">
     <div class="modal-content">
-
       <div class="modal-header">
-        <img id="modalImage" src="" class="reward-logo" alt="Reward Logo"/>
+        <img id="modalImage" src="" class="reward-logo" alt="Reward Logo" />
         <span id="modalTitle" class="reward-text"></span>
       </div>
 
@@ -43,7 +42,7 @@
 
       <div class="password-container input-group">
         <i class="fas fa-lock input-icon"></i>
-        <input type="password" id="modalPasswordInput" placeholder="Password"/>
+        <input type="password" id="modalPasswordInput" placeholder="Password" />
       </div>
 
       <button onclick="checkModalPassword()">
@@ -75,17 +74,17 @@
     <div class="modal-content">
       <button class="close-modal" onclick="closeModal()">&times;</button>
       <div class="modal-header">
-        <img id="helpModalImage" src="" class="reward-logo" alt="Reward Logo"/>
+        <img id="helpModalImage" src="" class="reward-logo" alt="Reward Logo" />
         <span class="reward-text">Garena Shells</span>
       </div>
 
       <div class="help-content">
-        <br/>
-        <b>How to reload Garena account with Garena Shells?</b><br/><br/>
-        Go to <a href="https://shop.garena.ph" target="_blank" class="shop-link">Garena PH Topup Center</a><br/><br/>
-        1. Login to your Garena Account or Player ID<br/>
-        2. Click Call of Duty: Mobile and select Garena Prepaid Card<br/>
-        3. Enter your Garena Shell Prepaid Card Password<br/>
+        <br />
+        <b>How to reload Garena account with Garena Shells?</b><br /><br />
+        Go to <a href="https://shop.garena.ph" target="_blank" class="shop-link">Garena PH Topup Center</a><br /><br />
+        1. Login to your Garena Account or Player ID<br />
+        2. Click Call of Duty: Mobile and select Garena Prepaid Card<br />
+        3. Enter your Garena Shell Prepaid Card Password<br />
         4. Click Confirm to complete top up
       </div>
 
@@ -96,21 +95,21 @@
   <!-- Form Modal -->
   <div id="formModal" class="modal">
     <div class="modal-content">
-
       <div class="modal-header">
-        <img id="formModalImage" src="" class="reward-logo" alt="Reward Logo"/>
+        <img id="formModalImage" src="" class="reward-logo" alt="Reward Logo" />
         <span id="formModalTitle" class="reward-text"></span>
       </div>
 
       <p id="formModalInstructions">Please fill out the form to claim your reward:</p>
 
+      <!-- Dynamic form fields container -->
       <div id="formFieldsContainer" class="form-container">
-        <!-- Dynamic form fields will be inserted here -->
+        <!-- Dynamic fields will be inserted here by Firebase -->
       </div>
 
       <div class="redemption-key-container">
         <label>Redemption Key:</label>
-        <input type="text" id="redemptionKeyDisplay" readonly/>
+        <input type="text" id="redemptionKeyDisplay" readonly />
       </div>
 
       <button onclick="submitForm()">
@@ -122,6 +121,47 @@
 
       <div id="formModalMessage"></div>
       <p class="credits">Your reward will be processed shortly.</p>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img id="confirmModalImage" src="" class="reward-logo" alt="Reward Logo" />
+        <span class="reward-text">Confirm Details</span>
+      </div>
+
+      <p>Please verify this is your correct MLBB account:</p>
+
+      <div class="account-display">
+        <div class="account-info">
+          <span class="info-label">Username:</span>
+          <span id="confirmUsername" class="info-value"></span>
+        </div>
+        <div class="account-info">
+          <span class="info-label">User ID:</span>
+          <span id="confirmUserId" class="info-value"></span>
+        </div>
+        <div class="account-info">
+          <span class="info-label">Zone ID:</span>
+          <span id="confirmZoneId" class="info-value"></span>
+        </div>
+      </div>
+
+      <div id="confirmationMessage"></div>
+
+      <div class="button-group">
+        <button class="secondary" onclick="event.stopPropagation(); closeConfirmationModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button onclick="event.stopPropagation(); confirmSubmission()">
+          <i class="fas fa-check"></i> Confirm
+          <span id="confirmSpinner" class="loading-spinner hidden">
+            <i class="fas fa-spinner"></i>
+          </span>
+        </button>
+      </div>
     </div>
   </div>
 
