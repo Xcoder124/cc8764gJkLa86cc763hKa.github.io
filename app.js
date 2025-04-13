@@ -1,7 +1,8 @@
 import { db } from './firebase-config.js';
 import {
   collection, query, where, getDocs,
-  addDoc, updateDoc, doc, increment
+  addDoc, updateDoc, doc, increment,
+  getDoc // Add this
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 let currentReward = null;
@@ -302,10 +303,50 @@ async function checkModalPassword() {
   spinner.classList.add('hidden');
 }
 
-function showRedemptionHelp() {
+async function showRedemptionHelp() {
+  if (!currentReward) {
+    messageElement.textContent = "No current reward is present. Cannot show the instructions.";
+    messageElement.className = "error";
+  }
+
   const modal = document.getElementById('helpModal');
-  document.getElementById('helpModalImage').src = currentReward.imageUrl;
-  modal.classList.add('active');
+  const helpContent = document.getElementById('helpContent');
+  const spinner = document.getElementById('helpSpinner');
+  const modalImage = document.getElementById('helpModalImage');
+
+  console.log("Modal:", modal);
+  console.log("Help Content:", helpContent);
+  console.log("Spinner:", spinner);
+  console.log("Image:", modalImage);
+
+  if (helpContent) helpContent.innerHTML = '';
+  if (spinner) spinner.classList.remove('hidden');
+  if (modalImage) modalImage.src = currentReward.imageUrl || '';
+
+  try {
+    const instructionRef = doc(db, "Instructions", currentReward.instructionId);
+    const instructionSnap = await getDoc(instructionRef);
+
+    if (!instructionSnap.exists()) {
+      throw new Error("No help instructions found.");
+    }
+
+    const data = instructionSnap.data();
+    if (!data.instructionsHTML) {
+      throw new Error("instructionsHTML field is missing.");
+    }
+
+    if (helpContent) {
+      helpContent.innerHTML = data.instructionsHTML;
+    }
+  } catch (error) {
+    if (helpContent) {
+      helpContent.innerHTML = `<p class="error">⚠️ ${error.message}</p>`;
+    }
+  } finally {
+    if (spinner) spinner.classList.add('hidden');
+    if (modal) modal.classList.add('active');
+  }
 }
 
 function toggleSecret() {
