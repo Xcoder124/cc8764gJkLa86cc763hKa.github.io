@@ -477,4 +477,9 @@ h1 {
   .input-icon {
     left: 20px;
   }
+
+#helpSpinner {
+  margin: 20px 0;
+}
     }
+    
