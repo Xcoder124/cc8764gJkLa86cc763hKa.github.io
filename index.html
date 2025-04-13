@@ -69,28 +69,26 @@
     </div>
   </div>
 
-  <!-- Help Modal -->
-  <div id="helpModal" class="modal">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeModal()">&times;</button>
-      <div class="modal-header">
-        <img id="helpModalImage" src="" class="reward-logo" alt="Reward Logo" />
-        <span class="reward-text">Garena Shells</span>
-      </div>
-
-      <div class="help-content">
-        <br />
-        <b>How to reload Garena account with Garena Shells?</b><br /><br />
-        Go to <a href="https://shop.garena.ph" target="_blank" class="shop-link">Garena PH Topup Center</a><br /><br />
-        1. Login to your Garena Account or Player ID<br />
-        2. Click Call of Duty: Mobile and select Garena Prepaid Card<br />
-        3. Enter your Garena Shell Prepaid Card Password<br />
-        4. Click Confirm to complete top up
-      </div>
-
-      <p class="credits">Need more help? Contact support</p>
+<!-- Help Modal -->
+<div id="helpModal" class="modal">
+  <div class="modal-content">
+    <button class="close-modal" onclick="closeModal()">&times;</button>
+    <div class="modal-header">
+      <img id="helpModalImage" src="" class="reward-logo" alt="Reward Logo" />
+      <span class="reward-text">Guide</span>
     </div>
+
+    <div class="help-content">
+      <span id="helpSpinner" class="loading-spinner hidden">
+        <i class="fas fa-spinner"></i>
+      </span>
+      <div id="helpContent"></div> <!-- Firebase content injected here -->
+    </div>
+
+    <p class="credits">Still don't know yet? Ask for assistance.</p>
   </div>
+</div>
+
 
   <!-- Form Modal -->
   <div id="formModal" class="modal">
@@ -120,7 +118,11 @@
       </button>
 
       <div id="formModalMessage"></div>
-      <p class="credits">Your reward will be processed shortly.</p>
+      <p class="credits">
+        <a href="javascript:void(0)" onclick="showRedemptionHelp()" class="help-link">
+          How to redeem? <i class="fas fa-question-circle"></i>
+        </a>
+      </p>
     </div>
   </div>
 
@@ -167,4 +169,4 @@
 
   <script type="module" src="app.js"></script>
 </body>
-</html>
+          </html>
